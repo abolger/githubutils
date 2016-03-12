@@ -1,0 +1,10 @@
+#!/bin/bash
+curl https://api.github.com/repos/jimzucker/hygieia/events\?per_page\=100 2>/dev/null|python -c 'import sys, json;
+print "sha".ljust(6," "),"type".ljust(10," "),"repo".ljust(10," "),"branch".ljust(10," ");
+rows=json.load(sys.stdin);
+for r in rows: 
+	print r["payload"]["head"][1:7],r["type"][0:9].ljust(10," "),r["repo"]["name"].split("/")[1][0:9].ljust(10," "),r["payload"]["ref"].split("/")[2][0:9].ljust(10," "), r["actor"]["login"]
+	for c in r["payload"]["commits"]:
+		print "       ","         ","          ","*commit* ",c["sha"][1:7].ljust(10," "), r["payload"]["ref"].split("/")[2][0:9].ljust(10," ")
+'
+
