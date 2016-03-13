@@ -1,10 +1,19 @@
 #!/bin/bash
 curl https://api.github.com/repos/jimzucker/hygieia/events\?per_page\=100 2>/dev/null|python -c 'import sys, json;
-print "sha".ljust(6," "),"type".ljust(10," "),"repo".ljust(10," "),"branch".ljust(10," ");
+print "sha".ljust(7," "),"type".ljust(10," "),"repo".ljust(10," "),"branch".ljust(10," "),"login".ljust(10," "),"message".ljust(40," ")
 rows=json.load(sys.stdin);
 for r in rows: 
-	print r["payload"]["head"][1:7],r["type"][0:9].ljust(10," "),r["repo"]["name"].split("/")[1][0:9].ljust(10," "),r["payload"]["ref"].split("/")[2][0:9].ljust(10," "), r["actor"]["login"]
+	type = r["type"][0:10]	
+	repo = r["repo"]["name"].split("/")[1][0:10]
+	login = r["actor"]["login"][0:10]
+	payload = r["payload"]
+	sha = payload.get("head")[0:7]
+	branch = payload["ref"].split("/")[2]
+	print sha, type.ljust(10," "), repo.ljust(10," "), branch.ljust(10," "), login.ljust(10," "),"".ljust(40," ")
+
 	for c in r["payload"]["commits"]:
-		print "       ","         ","          ","*commit* ",c["sha"][1:7].ljust(10," "), r["payload"]["ref"].split("/")[2][0:9].ljust(10," ")
+		shaCommit = c["sha"][0:7]
+		message = c["message"][0:40]
+		print "".ljust(7," "),shaCommit[0:7].ljust(10," "),"".ljust(10,"."),"".ljust(10,"."), "".ljust(10,"."),message.ljust(40," ")
 '
 
