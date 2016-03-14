@@ -2,7 +2,7 @@
 GITUSER=${1:-capitalone}
 GITREPO=${2:-hygieia}
 URL="https://api.github.com/repos/${GITUSER}/$GITREPO/events?per_page=100"
-NUMBER_PAGES=`curl -I "$URL" 2>/dev/null|egrep '^Link: '|awk -F'[=&>]' '{print $4}'`
+NUMBER_PAGES=`curl -I "$URL" 2>/dev/null|egrep '^Link: '|awk -F'[,]' '{print $2}'|awk -F'[=&>]' '{print $4}'`
 
 if [ "$NUMBER_PAGES" != "" ]
 then
@@ -10,5 +10,5 @@ then
 	do 
 		TMP_URL="${URL}&page=${i}"
 		curl "$TMP_URL" 2>/dev/null|githubreflog.py
-	done 
+	done |less
 fi
