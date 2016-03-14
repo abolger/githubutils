@@ -1,7 +1,5 @@
-#!/bin/bash
-#curl https://api.github.com/repos/capitalone/hygieia/events\?per_page\=100 2>/dev/null|python -c '
-curl https://api.github.com/repos/jimzucker/hygieia/events\?per_page\=100 2>/dev/null|python -c '
-import sys, json;
+#!/usr/local/bin/python
+import sys, json
 from colorama import Fore, Back, Style
 
 SHACOLW=7
@@ -15,10 +13,10 @@ SKIPEVENTS=["ForkEvent","IssuesEvent","WatchEvent","IssueCommentEvent","PullRequ
 def printIt( sha, type, repo, branch, login, message, filler):
 	message = message.replace("\n"," ")
 	print Fore.RED+sha[:SHACOLW].ljust(SHACOLW," ")+Fore.RESET,type[:EVENTCOLW].ljust(EVENTCOLW,filler),repo[:DFLTCOLW].ljust(DFLTCOLW,filler),branch[:BRANCHCOLW].ljust(BRANCHCOLW,filler),Fore.BLUE+login.ljust(DFLTCOLW," ")+Fore.RESET,message.ljust(MSGCOLW," ")
-	return;
+	return
 
+rows=json.load(sys.stdin)
 printIt("sha","type","repo","branch","login","message"," ")
-rows=json.load(sys.stdin);
 for r in rows: 
 	type = r.get("type","")
 	if type in SKIPEVENTS: 
@@ -53,5 +51,3 @@ for r in rows:
 						shaCommit = c["sha"][:SHACOLW]
 						message = c["message"][:MSGCOLW]
 						printIt(shaCommit,"", "", "", login,message,".")
-'
-
