@@ -1,8 +1,9 @@
 #!/usr/local/bin/python
-import sys, json, requests
+import sys, json, requests, subprocess, errno, re
 from colorama import Fore, Back, Style
 from subprocess import Popen, PIPE
-import errno
+#from giturlparse import parse
+
 
 #----------------------------------------------------------------------------------------------------------------------
 SHACOLW=7
@@ -42,13 +43,25 @@ def printIt( p, sha, type, repo, branch, login, message, filler):
 #----------------------------------------------------------------------------------------------------------------------
 
 #process arguments
-gitUser="capitalone"
-gitRepo="hygieia"
+gitRemote=subprocess.check_output(["git", "config", "--local", "remote.origin.url"])
+print gitRemote
+urlAttributes = re.match('((git|ssh|http(s)?)|(git@[\w\.]+))(:(//)?)([\w\.@\:/\-~]+)(\.git)(/)?', gitRemote)
+
+#this code will handle parsing all git url formats, but we dont need that right now
+#urlAttributes = parse(gitRemote)
+#print(json.dumps(urlAttributes, indent=4))
+
+if urlAttributes.groups()[0] == "git@github.com" :
+	gitUser=urlAttributes.groups()[6].split('/')[0]
+	gitRepo=urlAttributes.groups()[6].split('/')[1]
+else:
+	print 'ERROR: Not a GITHUB repo, other remote repos not currently supported'
+	exit(1)
+
 if len(sys.argv) >=2:
 	gitUser=sys.argv[1]
 if len(sys.argv) == 3:
 	gitRepo=sys.argv[2]
-	
 url="https://api.github.com/repos/" + gitUser + "/" + gitRepo + "/events?per_page=100"
 response = requests.get(url, stream=True)
 
