@@ -44,7 +44,6 @@ def printIt( p, sha, type, repo, branch, login, message, filler):
 
 #process arguments
 gitRemote=subprocess.check_output(["git", "config", "--local", "remote.origin.url"])
-print gitRemote
 urlAttributes = re.match('((git|ssh|http(s)?)|(git@[\w\.]+))(:(//)?)([\w\.@\:/\-~]+)(\.git)(/)?', gitRemote)
 
 #this code will handle parsing all git url formats, but we dont need that right now
@@ -55,8 +54,13 @@ if urlAttributes.groups()[0] == "git@github.com" :
 	gitUser=urlAttributes.groups()[6].split('/')[0]
 	gitRepo=urlAttributes.groups()[6].split('/')[1]
 else:
-	print 'ERROR: Not a GITHUB repo, other remote repos not currently supported'
-	exit(1)
+	if urlAttributes.groups()[6].split('/')[0] == "github.com":
+		gitUser=urlAttributes.groups()[6].split('/')[1]
+		gitRepo=urlAttributes.groups()[6].split('/')[2]
+	else:
+		print urlAttributes.groups()
+		print 'ERROR: Not a GITHUB repo, other remote repos not currently supported'
+		exit(1)
 
 if len(sys.argv) >=2:
 	gitUser=sys.argv[1]
@@ -69,8 +73,12 @@ response = requests.get(url, stream=True)
 p = Popen('less', stdin=PIPE)
 
 #get the total # of pages from the header
-numPages = int( response.headers["link"].split(",")[1].split("?")[1].split("&")[1].split("=")[1].split(">")[0])
-for i in range(1,numPages):
+try:
+	numPages = int( response.headers["link"].split(",")[1].split("?")[1].split("&")[1].split("=")[1].split(">")[0])
+except:
+	numPages = 1
+
+for i in range(1,numPages+1):
 	printIt(p, "sha", "type", "repo", "branch", "login", "message", " ")
 
 	if i > 1: 
@@ -106,6 +114,8 @@ for i in range(1,numPages):
 					refsplit = branch.split("/")
 					if len(refsplit) == 3:
 						branch = refsplit[2]
+				else:
+					branch = ""
 				printIt(p, sha, type, repo, branch, login, message," ")
 
 				commits = payload.get("commits")
@@ -115,6 +125,8 @@ for i in range(1,numPages):
 							shaCommit = c["sha"][:SHACOLW]
 							message = c["message"][:MSGCOLW]
 							printIt(p, shaCommit,"", "", "", login,message,".")
+				else:
+					commits = ""
 		else:
 			sha = ""
 			branch = ""
