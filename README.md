@@ -9,7 +9,9 @@ Utilities to work with Github
 
 ###Optional Paramaters
   -u <github users> - defaults to user from origin url of current directory
+  
   -r <github Repo> - defaults to repo from origin url of current directory
+  
   -f <Filter Pattern> - you can filter by simple text string, ie PushEvent , Create|Delete, 2fb0255, etc ...
   
   Try it out and if you have feedback please open a Issue on this project.
