@@ -7,4 +7,11 @@ Utilities to work with Github
   
   <img src="images/github-reflog-branch-history.png" width="900"/>
 
+###Optional Paramaters
+  -u <github users> - defaults to user from origin url of current directory
+  -r <github Repo> - defaults to repo from origin url of current directory
+  -f <Filter Pattern> - you can filter by simple text string, ie PushEvent , Create|Delete, 2fb0255, etc ...
+  
+  Try it out and if you have feedback please open a Issue on this project.
+
   <img src="images/githubrelog-sample-output.png" width="900"/>
