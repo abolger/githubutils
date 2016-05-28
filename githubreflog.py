@@ -16,6 +16,18 @@ HANDLEDEVENTS=["CreateEvent","DeleteEvent","PushEvent","CommitCommentEvent"]
 #SKIPEVENTS=["ForkEvent","IssuesEvent","WatchEvent","IssueCommentEvent","PullRequestEvent","PullRequestReviewCommentEvent"]
 
 #Function to print the output
+def filter(filterPattern, p, sha, type, repo, branch, login, message, filler):
+	if filterPattern == "":
+		printIt( p, sha, type, repo, branch, login, message, filler)
+	else:	
+		#apply filter
+		pattern = re.compile(".*" + filterPattern + ".*")
+		tempString = sha + " " + type + " " + repo + " " + branch + " " + login + " " + message 
+		match = pattern.search(tempString)
+		if match is not None:
+			printIt( p, sha, type, repo, branch, login, message, filler)
+	return
+	
 def printIt( p, sha, type, repo, branch, login, message, filler):
 
 	#clean up comments that have \n in them
@@ -53,6 +65,8 @@ urlAttributes = re.match('((git|ssh|http(s)?)|(git@[\w\.]+))(:(//)?)([\w\.@\:/\-
 #get the default ID/Pwd
 gitUser=""
 gitRepo=""
+filterPattern=""
+
 try:
 	if urlAttributes.groups()[0] == "git@github.com" :
 		gitUser=urlAttributes.groups()[6].split('/')[0]
@@ -126,7 +140,7 @@ for i in range(1,numPages+1):
 				comment = payload.get("comment")
 				sha = comment.get("commit_id")
 				branch = ""
-				printIt(p, sha, type, repo, branch, login, message, " ")
+				filter(filterPattern, p, sha, type, repo, branch, login, message, " ")
 			else:
 				#Enhance message for a Create Event to show the source branch
 				if type == "CreateEvent":
@@ -139,7 +153,7 @@ for i in range(1,numPages+1):
 						branch = refsplit[2]
 				else:
 					branch = ""
-				printIt(p, sha, type, repo, branch, login, message," ")
+				filter(filterPattern, p, sha, type, repo, branch, login, message," ")
 
 				commits = payload.get("commits")
 				if commits:
@@ -147,13 +161,13 @@ for i in range(1,numPages+1):
 						if c:
 							shaCommit = c["sha"][:SHACOLW]
 							message = c["message"][:MSGCOLW]
-							printIt(p, shaCommit,"", "", "", login,message,".")
+							filter(filterPattern, p, shaCommit,"", "", "", login,message,".")
 				else:
 					commits = ""
 		else:
 			sha = ""
 			branch = ""
-			printIt(p, sha, type, repo, branch, login, message," ")
+			filter(filterPattern, p, sha, type, repo, branch, login, message," ")
 
 #clean up the pipe
 p.stdin.close()
