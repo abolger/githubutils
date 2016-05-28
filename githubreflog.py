@@ -1,5 +1,5 @@
 #!/usr/local/bin/python
-import sys, json, requests, subprocess, errno, re
+import sys, json, requests, subprocess, errno, re, getopt
 from colorama import Fore, Back, Style
 from subprocess import Popen, PIPE
 #from giturlparse import parse
@@ -50,22 +50,45 @@ urlAttributes = re.match('((git|ssh|http(s)?)|(git@[\w\.]+))(:(//)?)([\w\.@\:/\-
 #urlAttributes = parse(gitRemote)
 #print(json.dumps(urlAttributes, indent=4))
 
-if urlAttributes.groups()[0] == "git@github.com" :
-	gitUser=urlAttributes.groups()[6].split('/')[0]
-	gitRepo=urlAttributes.groups()[6].split('/')[1]
-else:
-	if urlAttributes.groups()[6].split('/')[0] == "github.com":
-		gitUser=urlAttributes.groups()[6].split('/')[1]
-		gitRepo=urlAttributes.groups()[6].split('/')[2]
+#get the default ID/Pwd
+gitUser=""
+gitRepo=""
+try:
+	if urlAttributes.groups()[0] == "git@github.com" :
+		gitUser=urlAttributes.groups()[6].split('/')[0]
+		gitRepo=urlAttributes.groups()[6].split('/')[1]
 	else:
-		print urlAttributes.groups()
-		print 'ERROR: Not a GITHUB repo, other remote repos not currently supported'
-		exit(1)
+		if urlAttributes.groups()[6].split('/')[0] == "github.com":
+			gitUser=urlAttributes.groups()[6].split('/')[1]
+			gitRepo=urlAttributes.groups()[6].split('/')[2]
+		else:
+			print urlAttributes.groups()
+			print 'ERROR: Not a GITHUB repo, other remote repos not currently supported'
+			sys.exit(2)
+except:
+	pass
 
-if len(sys.argv) >=2:
-	gitUser=sys.argv[1]
-if len(sys.argv) == 3:
-	gitRepo=sys.argv[2]
+#get params
+try:
+	opts, args = getopt.getopt(sys.argv[1:],'u:r:f:h')
+except: 
+	print 'githubreflog.py [-u <github user>] [-r <github repo>] [-f <filter pattern>]'
+	sys.exit(2)
+
+for opt, arg in opts:
+	if opt == '-h':
+		print 'githubreflog.py [-u <github user>] [-r <github repo>] [-f <filter pattern>]'
+		sys.exit()
+	elif opt == '-u':
+		gitUser = arg
+	elif opt == '-r':
+		gitRepo = arg
+	elif opt == '-f':
+		filterPattern = arg
+
+#
+#build rest call to github
+#
 url="https://api.github.com/repos/" + gitUser + "/" + gitRepo + "/events?per_page=100"
 response = requests.get(url, stream=True)
 
