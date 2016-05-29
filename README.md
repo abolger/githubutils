@@ -1,5 +1,5 @@
-# githubutils
-Utilities to work with Github
+# gitreflog
+Utilities to work with reflog/event history on github
 
 
 ##githubreflog.sh/.py
