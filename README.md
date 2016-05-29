@@ -1,4 +1,4 @@
-# gitreflog
+# githubutils
 Utilities to work with reflog/event history on github
 
 
