@@ -8,7 +8,9 @@ Utilities to work with reflog/event history on github
   
   Here is the output when Filtering for 'tech' so we can see the history of who created/deleted the techdebt2 branch, I ran this on my fork of a project I work on, obviously it would be more interesting when more people are working on the branch.
   
-  * ../githubutils/githubreflog.py -u jimzucker -r hygieia -f tech
+```
+  ./githubreflog.py -u jimzucker -r hygieia -f tech
+```
   <img src="images/branch-history.png" width="900"/>
 
   Note: You can also grep the output for patterns, if you prefer to using -f, this is a community project so the output is a bit more interesting.  You can see who created the branch and who deleted it clearly.
@@ -23,5 +25,5 @@ Utilities to work with reflog/event history on github
   
   Try it out and if you have feedback please open a Issue on this project.
 
-  <img src="images/githubrelog-sample-output.png" width="900"/>
-    
+###To Do:
+  * Impliment for local repos
